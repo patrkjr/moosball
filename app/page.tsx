@@ -1,19 +1,43 @@
-import { Button } from "@/components/ui/button"
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+import { Leaderboard } from '@/components/leaderboard';
+import { MatchPanel } from '@/components/match-panel';
+import {
+  getAllPlayers,
+  getLeaderboard,
+  getRecentGames,
+} from '@/lib/queries';
+
+export default async function Page() {
+  const [leaderboard, allPlayers, recentGames] = await Promise.all([
+    getLeaderboard(),
+    getAllPlayers(),
+    getRecentGames(10),
+  ]);
+
+  const playerOptions = allPlayers.map((player) => ({
+    id: player.id,
+    name: player.name,
+  }));
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
+    <main className="min-h-svh bg-background">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
+        <header className="flex flex-col gap-2">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Moosball League
+          </h1>
+          <p className="max-w-2xl text-muted-foreground">
+            2v2 table football tracker with team-average ELO rankings and match
+            history.
+          </p>
+        </header>
+
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <Leaderboard entries={leaderboard} />
+          <MatchPanel players={playerOptions} games={recentGames} />
         </div>
       </div>
-    </div>
-  )
+    </main>
+  );
 }
