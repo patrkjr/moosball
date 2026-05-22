@@ -46,6 +46,7 @@ export function PlayerProfile({ player, games }: PlayerProfileProps) {
     month: 'long',
     year: 'numeric',
   });
+  const isTopRanked = player.rank === 1;
 
   return (
     <main className="min-h-svh bg-background">
@@ -60,20 +61,22 @@ export function PlayerProfile({ player, games }: PlayerProfileProps) {
           </Link>
 
           <div className="flex flex-col gap-2">
-            <h1 className="flex items-center gap-2.5 text-3xl font-semibold tracking-tight">
-              <Image
-                src="/images/emojis/holding-ball.png"
-                alt=""
-                width={36}
-                height={36}
-                className="size-9 shrink-0"
-                aria-hidden
-              />
+            <h1 className="text-3xl font-semibold tracking-tight">
               <EditablePlayerName playerId={player.id} name={player.name} />
             </h1>
             <p className="text-muted-foreground">
               Rank #{player.rank} · {player.elo} ELO
             </p>
+            {isTopRanked ? (
+              <Image
+                src="/images/emojis/small-medal.png"
+                alt=""
+                width={96}
+                height={96}
+                className="size-24 shrink-0"
+                aria-hidden
+              />
+            ) : null}
           </div>
         </header>
 
