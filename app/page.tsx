@@ -1,5 +1,7 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
+
 import { Leaderboard } from '@/components/leaderboard';
 import { MatchPanel } from '@/components/match-panel';
 import {
@@ -24,7 +26,15 @@ export default async function Page() {
     <main className="min-h-svh bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
         <header className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="flex items-center gap-2.5 text-3xl font-semibold tracking-tight">
+            <Image
+              src="/images/emojis/checkered-ball.png"
+              alt=""
+              width={36}
+              height={36}
+              className="size-9 shrink-0"
+              aria-hidden
+            />
             Moosball League
           </h1>
           <p className="max-w-2xl text-muted-foreground">
