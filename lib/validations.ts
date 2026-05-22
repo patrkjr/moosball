@@ -6,6 +6,11 @@ export const playerNameSchema = z
   .min(1, 'Name is required.')
   .max(64, 'Name must be 64 characters or fewer.');
 
+export const updatePlayerNameSchema = z.object({
+  playerId: z.string().uuid('Invalid player.'),
+  name: playerNameSchema,
+});
+
 export const foosballScoreSchema = z
   .object({
     team1Score: z.coerce.number().int().min(0).max(10),

@@ -6,7 +6,11 @@ import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { games, players } from '@/lib/db/schema';
 import { calculateMatchElo } from '@/lib/elo';
-import { playerNameSchema, recordMatchSchema } from '@/lib/validations';
+import {
+  playerNameSchema,
+  recordMatchSchema,
+  updatePlayerNameSchema,
+} from '@/lib/validations';
 
 export type ActionResult =
   | { ok: true }
@@ -33,13 +37,55 @@ export async function addPlayer(name: string): Promise<ActionResult> {
   }
 
   try {
-    await db.insert(players).values({ name: parsed.data });
+    const [created] = await db
+      .insert(players)
+      .values({ name: parsed.data })
+      .returning({ id: players.id });
     revalidatePath('/');
+    if (created) {
+      revalidatePath(`/players/${created.id}`);
+    }
     return { ok: true };
   } catch (error) {
     const message = isUniqueViolation(error)
       ? 'A player with this name already exists.'
       : 'Could not add player. Please try again.';
+    return { ok: false, message };
+  }
+}
+
+export async function updatePlayerName(
+  playerId: string,
+  name: string,
+): Promise<ActionResult> {
+  const parsed = updatePlayerNameSchema.safeParse({ playerId, name });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: parsed.error.issues[0]?.message ?? 'Invalid name.',
+    };
+  }
+
+  const { playerId: id, name: nextName } = parsed.data;
+
+  try {
+    const updated = await db
+      .update(players)
+      .set({ name: nextName })
+      .where(eq(players.id, id))
+      .returning({ id: players.id, name: players.name });
+
+    if (updated.length === 0) {
+      return { ok: false, message: 'Player not found.' };
+    }
+
+    revalidatePath('/');
+    revalidatePath(`/players/${id}`);
+    return { ok: true };
+  } catch (error) {
+    const message = isUniqueViolation(error)
+      ? 'A player with this name already exists.'
+      : 'Could not update name. Please try again.';
     return { ok: false, message };
   }
 }
@@ -131,6 +177,9 @@ export async function recordMatch(
     });
 
     revalidatePath('/');
+    for (const playerId of playerIds) {
+      revalidatePath(`/players/${playerId}`);
+    }
     return { ok: true };
   } catch (error) {
     const message =

@@ -2,6 +2,9 @@ import type { RecentGameEntry } from '@/lib/queries';
 
 type MatchHistoryProps = {
   games: RecentGameEntry[];
+  title?: string;
+  description?: string;
+  emptyMessage?: string;
 };
 
 function formatDelta(delta: number) {
@@ -66,18 +69,21 @@ function MatchHistoryItem({ game }: { game: RecentGameEntry }) {
   );
 }
 
-export function MatchHistory({ games }: MatchHistoryProps) {
+export function MatchHistory({
+  games,
+  title = 'Match History',
+  description = 'Recent 2v2 results',
+  emptyMessage = 'No matches recorded yet.',
+}: MatchHistoryProps) {
   return (
     <section className="flex min-h-0 flex-1 flex-col gap-3">
       <div>
-        <h2 className="text-lg font-semibold">Match History</h2>
-        <p className="text-sm text-muted-foreground">Recent 2v2 results</p>
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
       {games.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No matches recorded yet.
-        </p>
+        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
       ) : (
         <ul className="flex max-h-[480px] flex-col gap-3 overflow-y-auto pr-1">
           {games.map((game) => (

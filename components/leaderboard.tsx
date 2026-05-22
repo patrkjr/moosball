@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { AddPlayerDialog } from '@/components/add-player-dialog';
 import {
   Table,
@@ -44,7 +46,14 @@ export function Leaderboard({ entries }: LeaderboardProps) {
             {entries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell className="font-medium">{entry.rank}</TableCell>
-                <TableCell>{entry.name}</TableCell>
+                <TableCell>
+                  <Link
+                    href={`/players/${entry.id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {entry.name}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {entry.elo}
                 </TableCell>
